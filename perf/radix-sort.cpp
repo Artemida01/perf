@@ -8,8 +8,7 @@
 namespace {
 
 std::vector<uint64_t> random_vector(size_t size) {
-  std::vector<uint64_t> result;
-  result.resize(size);
+  std::vector<uint64_t> result(size);
 
   std::mt19937 rng(std::mt19937::default_seed);
   std::uniform_int_distribution<uint64_t> element_dist;
@@ -32,10 +31,11 @@ size_t count_zero_bits(const std::vector<uint64_t>& input, size_t bit) {
 
 // DO NOT change the algorithm
 void radix_sort(std::vector<uint64_t>& input) {
+  std::vector<uint64_t> buffer(input.size());
   for (size_t bit = 0; bit < std::numeric_limits<uint64_t>::digits; ++bit) {
     auto count = count_zero_bits(input, bit);
 
-    std::vector<uint64_t> buffer(input.size());
+    std::fill(buffer.begin(), buffer.end(), 0);
 
     size_t i = 0;
     size_t j = count;
