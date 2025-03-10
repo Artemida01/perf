@@ -14,12 +14,6 @@ std::ostream& operator<<(std::ostream& out, const User& user) {
   return out;
 }
 
-std::string to_json(const User& user) {
-  std::stringstream ss;
-  ss << user;
-  return ss.str();
-}
-
 // DO NOT change this struct
 struct Message {
   int64_t id;
@@ -30,12 +24,34 @@ struct Message {
   User to;
 };
 
+std::string to_json(const User& user) {
+  std::string result;
+  result.reserve(128);
+  result.append("{\"id\":")
+      .append(std::to_string(user.id))
+      .append(",\"username\":\"")
+      .append(user.username)
+      .append("\"}");
+  return result;
+}
+
 // DO NOT change this function's signature
 std::string to_json(const Message& msg) {
-  std::stringstream ss;
-  ss << "{" << "\"id\":" << msg.id << "," << "\"subject\":\"" << msg.subject << "\"," << "\"body\":\"" << msg.body
-     << "\"," << "\"from\":" << msg.from << "," << "\"to\":" << msg.to << "}";
-  return ss.str();
+  std::string result;
+  result.reserve(256);
+
+  result.append("{\"id\":")
+      .append(std::to_string(msg.id))
+      .append(",\"subject\":\"")
+      .append(msg.subject)
+      .append("\",\"body\":\"")
+      .append(msg.body)
+      .append("\",\"from\":")
+      .append(to_json(msg.from))
+      .append(",\"to\":")
+      .append(to_json(msg.to))
+      .append("}");
+  return result;
 }
 
 namespace {
