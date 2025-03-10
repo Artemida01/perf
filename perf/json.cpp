@@ -14,16 +14,6 @@ std::ostream& operator<<(std::ostream& out, const User& user) {
   return out;
 }
 
-// DO NOT change this struct
-struct Message {
-  int64_t id;
-  std::string subject;
-  std::string body;
-
-  User from;
-  User to;
-};
-
 std::string to_json(const User& user) {
   std::string result;
   result.reserve(128);
@@ -34,6 +24,16 @@ std::string to_json(const User& user) {
       .append("\"}");
   return result;
 }
+
+// DO NOT change this struct
+struct Message {
+  int64_t id;
+  std::string subject;
+  std::string body;
+
+  User from;
+  User to;
+};
 
 // DO NOT change this function's signature
 std::string to_json(const Message& msg) {
