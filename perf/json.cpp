@@ -14,14 +14,16 @@ std::ostream& operator<<(std::ostream& out, const User& user) {
   return out;
 }
 
+template <typename... Args>
+void add_multy(std::string& answer, Args&&... args) {
+  (answer += ... += std::forward<Args>(args));
+}
+
 std::string to_json(const User& user) {
   std::string result;
   result.reserve(128);
-  result.append("{\"id\":")
-      .append(std::to_string(user.id))
-      .append(",\"username\":\"")
-      .append(user.username)
-      .append("\"}");
+
+  add_multy(result, "{\"id\":", std::to_string(user.id), ",\"username\":\"", user.username, "\"}");
   return result;
 }
 
@@ -40,17 +42,21 @@ std::string to_json(const Message& msg) {
   std::string result;
   result.reserve(256);
 
-  result.append("{\"id\":")
-      .append(std::to_string(msg.id))
-      .append(",\"subject\":\"")
-      .append(msg.subject)
-      .append("\",\"body\":\"")
-      .append(msg.body)
-      .append("\",\"from\":")
-      .append(to_json(msg.from))
-      .append(",\"to\":")
-      .append(to_json(msg.to))
-      .append("}");
+  add_multy(
+      result,
+      "{\"id\":",
+      std::to_string(msg.id),
+      ",\"subject\":\"",
+      msg.subject,
+      "\",\"body\":\"",
+      msg.body,
+      "\",\"from\":",
+      to_json(msg.from),
+      ",\"to\":",
+      to_json(msg.to),
+      "}"
+  );
+
   return result;
 }
 
