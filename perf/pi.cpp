@@ -12,13 +12,13 @@ struct MonteCarlo {
   int64_t total = 0;
   int64_t inside_circle = 0;
 
-  MonteCarlo() {
-    std::srand(42);
-  }
+  MonteCarlo()
+      : rng(42)
+      , dist(0, SQUARE_SIZE - 1) {}
 
   void operator()() {
-    int x = std::rand() % SQUARE_SIZE;
-    int y = std::rand() % SQUARE_SIZE;
+    int x = dist(rng);
+    int y = dist(rng);
 
     ++total;
     if (x * x + y * y < SQUARE_SIZE * SQUARE_SIZE) {
@@ -32,6 +32,9 @@ struct MonteCarlo {
 
 private:
   static constexpr size_t SQUARE_SIZE = 1000;
+  
+  std::minstd_rand rng;
+  std::uniform_int_distribution<int> dist;
 };
 
 void bm_compute_pi(benchmark::State& state) {
