@@ -32,7 +32,7 @@ struct MonteCarlo {
 
 private:
   static constexpr size_t SQUARE_SIZE = 1000;
-  
+
   std::minstd_rand rng;
   std::uniform_int_distribution<int> dist;
 };
