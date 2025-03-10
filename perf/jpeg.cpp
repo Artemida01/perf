@@ -7,7 +7,20 @@ namespace {
 
 using Pixel = std::vector<int>;
 
-using Picture = std::vector<std::vector<Pixel>>;
+struct Picture {
+  size_t height;
+  size_t width;
+  std::vector<int> red;
+  std::vector<int> green;
+  std::vector<int> blue;
+
+  Picture(size_t h, size_t w)
+      : height(h)
+      , width(w)
+      , red(h * w)
+      , green(h * w)
+      , blue(h * w) {}
+};
 
 Picture random_picture() {
   static constexpr size_t HEIGHT = 600;
@@ -16,35 +29,47 @@ Picture random_picture() {
   std::mt19937 rng(std::mt19937::default_seed);
   std::uniform_int_distribution<int> color_dist(0, 255);
 
-  Picture picture;
+  Picture picture(HEIGHT, WIDTH);
+
   for (size_t i = 0; i < HEIGHT; i++) {
-    picture.emplace_back();
     for (size_t j = 0; j < WIDTH; j++) {
-      picture.back().emplace_back() = Pixel{color_dist(rng), color_dist(rng), color_dist(rng)};
+      size_t index = i * WIDTH + j;
+      picture.red[index] = color_dist(rng);
+      picture.green[index] = color_dist(rng);
+      picture.blue[index] = color_dist(rng);
     }
   }
   return picture;
 }
 
 Picture scale_down(const Picture& picture) {
-  Picture scaled;
+  size_t scaled_height = picture.height / 2;
+  size_t scaled_width = picture.width / 2;
 
-  for (size_t i = 0; i < picture.size(); i += 2) {
-    scaled.emplace_back();
-    for (size_t j = 0; j < picture[0].size(); j += 2) {
-      auto avg_component = [&](size_t component_idx) {
-        int sum = 0;
-        sum += picture[i][j][component_idx];
-        sum += picture[i + 1][j][component_idx];
-        sum += picture[i][j + 1][component_idx];
-        sum += picture[i + 1][j + 1][component_idx];
-        return sum / 4;
-      };
+  Picture scaled(scaled_height, scaled_width);
 
-      int red = avg_component(0);
-      int blue = avg_component(1);
-      int green = avg_component(2);
-      scaled.back().emplace_back() = Pixel{red, blue, green};
+  for (size_t i = 0; i < scaled_height; i++) {
+    for (size_t j = 0; j < scaled_width; j++) {
+      size_t original_i = i * 2;
+      size_t original_j = j * 2;
+
+      // idxs for initial image
+      size_t idx1 = original_i * picture.width + original_j;
+      size_t idx2 = (original_i + 1) * picture.width + original_j;
+      size_t idx3 = original_i * picture.width + (original_j + 1);
+      size_t idx4 = (original_i + 1) * picture.width + (original_j + 1);
+
+      int avg_red = (picture.red[idx1] + picture.red[idx2] + picture.red[idx3] + picture.red[idx4]) / 4;
+
+      int avg_green = (picture.green[idx1] + picture.green[idx2] + picture.green[idx3] + picture.green[idx4]) / 4;
+
+      int avg_blue = (picture.blue[idx1] + picture.blue[idx2] + picture.blue[idx3] + picture.blue[idx4]) / 4;
+
+      // Idxs for new image
+      size_t scaled_idx = i * scaled_width + j;
+      scaled.red[scaled_idx] = avg_red;
+      scaled.green[scaled_idx] = avg_green;
+      scaled.blue[scaled_idx] = avg_blue;
     }
   }
 
